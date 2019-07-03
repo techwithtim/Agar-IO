@@ -8,7 +8,7 @@ import math
 S = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 S.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 
-SERVER = "10.50.160.213"
+SERVER = "10.50.120.202"
 PORT = 5555
 
 BALL_RADIUS = 5
@@ -120,7 +120,7 @@ def threaded_client(conn):
 	'''
 	while True:
 		if start:
-			game_time = time.time()-start_time()
+			game_time = round(time.time()-start_time)
 		try:
 			# Recieve data from client
 			data = conn.recv(32)
