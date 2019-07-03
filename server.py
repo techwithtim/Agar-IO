@@ -66,7 +66,7 @@ def create_balls(balls, n):
 			x = random.randrange(0,W)
 			y = random.randrange(0,H)
 			for player in players:
-				p = players[plauyer]
+				p = players[player]
 				dis = math.sqrt((x - p["x"])**2 + (y-p["y"])**2)
 				if dis <= START_RADIUS + p["score"]:
 					stop = False
@@ -81,7 +81,7 @@ def get_start_location(players):
 		x = random.randrange(0,W)
 		y = random.randrange(0,H)
 		for player in players:
-			p = players[plauyer]
+			p = players[player]
 			dis = math.sqrt((x - p["x"])**2 + (y-p["y"])**2)
 			if dis <= START_RADIUS + p["score"]:
 				stop = False
