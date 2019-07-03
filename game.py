@@ -14,6 +14,7 @@ BALL_RADIUS = 5
 W, H = 1000, 700
 
 NAME_FONT = pygame.font.SysFont("comicsans", 20)
+TIME_FONT = pygame.font.SysFont("comicsans", 30)
 
 COLORS = [(255,0,0), (255, 128, 0), (255,255,0), (128,255,0),(0,255,0),(0,255,128),(0,255,255),(0, 128, 255), (0,0,255), (0,0,255), (128,0,255),(255,0,255), (255,0,128),(128,128,128), (0,0,0)]
 
@@ -23,7 +24,7 @@ balls = []
 
 # FUNCTIONS
 
-def redraw_window(players, balls):
+def redraw_window(players, balls, game_time):
 	"""
 	draws each frame
 	:return: None
@@ -35,13 +36,16 @@ def redraw_window(players, balls):
 		pygame.draw.circle(WIN, ball[2], (ball[0], ball[1]), BALL_RADIUS)
 
 	# draw each player in the list
-	for player in players:
+	for player in sorted(players):
 		p = players[player]
 		pygame.draw.circle(WIN, p["color"], (p["x"], p["y"]), PLAYER_RADIUS + p["score"])
 		# render and draw name for each player
 		text = NAME_FONT.render(p["name"], 1, (0,0,0))
 		WIN.blit(text, (p["x"] - text.get_width()/2, p["y"] - text.get_height()/2))
 
+	# draw time
+	text = TIME_FONT.render("Time: " + str(game_time), 1, (0,0,0))
+	WIN.blit(text,(10,10))
 
 
 def main(name):
@@ -57,7 +61,7 @@ def main(name):
 	# start by connecting to the network
 	server = Network()
 	current_id = server.connect(name)
-	balls, players = server.send("get")
+	balls, players, game_time = server.send("get")
 
 	# setup the clock, limit to 30fps
 	clock = pygame.time.Clock()
@@ -105,10 +109,10 @@ def main(name):
 		data = "move " + str(player["x"]) + " " + str(player["y"])
 
 		# send data to server and recieve back all players information
-		balls, players = server.send(data)
+		balls, players, game_time = server.send(data)
 
 		# redraw window then update the frame
-		redraw_window(players, balls)
+		redraw_window(players, balls, game_time)
 		pygame.display.update()
 
 
