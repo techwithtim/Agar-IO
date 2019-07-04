@@ -208,11 +208,11 @@ while True:
 	
 	host, addr = S.accept()
 	print("[CONNECTION] Connected to:", addr)
-	if addr == SERVER:
+	if addr[0] == SERVER:
 		start = True
 		start_time = time.time()
 		print("[STARTED] Game Started")
-		
+
 	connections += 1
 	start_new_thread(threaded_client,(host,_id))
 	_id += 1
