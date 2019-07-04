@@ -1,9 +1,12 @@
 # small network game that has differnt blobs
 # moving around the screen
 
-import pygame
+import contextlib
+with contextlib.redirect_stdout(None):
+    import pygame
 from client import Network
 import random
+import os
 pygame.font.init()
 
 # Constants
@@ -146,7 +149,7 @@ while True:
  	else:
  		print("Error, this name is not allowed (must be between 1 and 19 characters [inclusive])")
 
-import os
+
 os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,30)
 WIN = pygame.display.set_mode((W,H))
 pygame.display.set_caption("Blobs")
