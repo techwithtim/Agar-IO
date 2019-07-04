@@ -15,7 +15,7 @@ PORT = 5555
 BALL_RADIUS = 5
 START_RADIUS = 7
 
-W, H = 1600, 860
+W, H = 1600, 830
 
 SERVER_IP = socket.gethostbyname(SERVER)
 
@@ -25,7 +25,7 @@ try:
 except socket.error as e:
     print(str(e))
 
-S.listen(2)
+S.listen()
 print("Server Started, Waiting for a connection...")
 
 players = {}
@@ -146,6 +146,7 @@ def threaded_client(conn, _id):
 	id - returns id of client
 	'''
 	while True:
+
 		if start:
 			game_time = round(time.time()-start_time)
 			if game_time // 5 == nxt:
@@ -171,8 +172,8 @@ def threaded_client(conn, _id):
 				if start:
 					check_collision(players, balls)
 					player_collision(players)
-				if len(balls) < 50:
-					create_balls(balls, 100)
+				if len(balls) < 100:
+					create_balls(balls, random.randrange(100,200))
 
 				send_data = pickle.dumps((balls,players, game_time))
 
@@ -192,6 +193,8 @@ def threaded_client(conn, _id):
 			print(e)
 			break
 
+		time.sleep(0.001)
+
 	# When user disconnects	
 	print("[DISCONNECT] Name:", name, ", Client Id:", current_id, "disconnected")
 	connections -= 1 
@@ -202,12 +205,12 @@ def threaded_client(conn, _id):
 # keeps looking to accept new connections
 create_balls(balls, 150)
 while True:
-	if not(start):
-		host, addr = S.accept()
-		connections += 1
-		if connections >= 2:
-			start = True
-			start_time = time.time()
-		print("[CONNECTION] Connected to:", addr)
-		start_new_thread(threaded_client,(host,_id))
-		_id += 1
+	
+	host, addr = S.accept()
+	connections += 1
+	if connections >= 2:
+		start = True
+		start_time = time.time()
+	print("[CONNECTION] Connected to:", addr)
+	start_new_thread(threaded_client,(host,_id))
+	_id += 1

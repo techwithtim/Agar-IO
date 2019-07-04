@@ -8,10 +8,10 @@ pygame.font.init()
 
 # Constants
 PLAYER_RADIUS = 10
-START_VEL = 7
+START_VEL = 9
 BALL_RADIUS = 5
 
-W, H = 1600, 860
+W, H = 1600, 830
 
 NAME_FONT = pygame.font.SysFont("comicsans", 20)
 TIME_FONT = pygame.font.SysFont("comicsans", 30)
@@ -87,9 +87,9 @@ def main(name):
 	run = True
 	while run:
 		player = players[current_id]
-		vel = START_VEL - round(player["score"]/10)
-		if vel <= 2:
-			vel = 2
+		vel = START_VEL - round(player["score"]/14)
+		if vel <= 1:
+			vel = 1
 
 		clock.tick(30) # 30 fps max
 
