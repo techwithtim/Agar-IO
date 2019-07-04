@@ -14,7 +14,7 @@ PORT = 5555
 BALL_RADIUS = 5
 START_RADIUS = 7
 
-W, H = 1000, 700
+W, H = 1600, 860
 
 SERVER_IP = socket.gethostbyname(SERVER)
 
@@ -36,8 +36,8 @@ start = False
 stat_time = 0
 game_time = "Starting Soon"
 
-def check_collision():
-	global players, balls
+
+def check_collision(players, balls):
 	"""
 	checks if any of the player have collided with any of the balls
 	:param players: a dictonary of players
@@ -55,8 +55,26 @@ def check_collision():
 
 			dis = math.sqrt((x - bx)**2 + (y-by)**2)
 			if dis <= START_RADIUS + p["score"]:
-				p["score"] = p["score"] + 1
+				p["score"] = p["score"] + 0.5
 				balls.remove(ball)
+
+
+def player_collision(players):
+	sort_players = sorted(players, key=lambda x: players[x]["score"])
+	for x, player1 in enumerate(sort_players):
+		for player2 in sort_players[x+1:]:
+			p1x = players[player1]["x"]
+			p1y = players[player1]["y"]
+
+			p2x = players[player2]["x"]
+			p2y = players[player2]["y"]
+
+			dis = math.sqrt((p1x - p2x)**2 + (p1y-p2y)**2)
+			if dis < players[player2]["score"] - players[player1]["score"]*0.85:
+				players[player2]["score"] = players[player2]["score"] + players[player1]["score"]
+				players[player1]["score"] = 0
+				players[player1]["x"], players[player1]["y"] = get_start_location(players)
+
 
 
 def create_balls(balls, n):
@@ -90,8 +108,8 @@ def get_start_location(players):
 			break
 	return (x,y)
 
-def threaded_client(conn):
-	global _id, connections, players, balls, game_time
+def threaded_client(conn, _id):
+	global connections, players, balls, game_time
 
 	current_id = _id
 
@@ -104,7 +122,6 @@ def threaded_client(conn):
 	color = colors[current_id]
 	x, y = get_start_location(players)
 	players[current_id] = {"x":x, "y":y,"color":color,"score":0,"name":name}  # x, y color, score, name
-	_id += 1
 
 	# pickle data and send initial info to clients
 	conn.send(str.encode(str(current_id)))
@@ -138,11 +155,13 @@ def threaded_client(conn):
 				y = int(split_data[2])
 				players[current_id]["x"] = x
 				players[current_id]["y"] = y
-				send_data = pickle.dumps((balls,players, game_time))
 				if start:
-					check_collision()
+					check_collision(players, balls)
+					player_collision(players)
 				if len(balls) < 50:
 					create_balls(balls, 100)
+
+				send_data = pickle.dumps((balls,players, game_time))
 
 			elif data.split(" ")[0] == "id":
 				send_data = str.encode(str(current_id))
@@ -161,7 +180,7 @@ def threaded_client(conn):
 			break
 
 	# When user disconnects	
-	print("[DISCONNECT] Client Id:", current_id, "disconnected")
+	print("[DISCONNECT] Name:", name, ", Client Id:", current_id, "disconnected")
 	connections -= 1 
 	del players[current_id]
 	conn.close()
@@ -173,8 +192,9 @@ while True:
 	if not(start):
 		host, addr = S.accept()
 		connections += 1
-		if connections > 2:
+		if connections >= 2:
 			start = True
 			start_time = time.time()
 		print("[CONNECTION] Connected to:", addr)
-		start_new_thread(threaded_client,(host,))
+		start_new_thread(threaded_client,(host,_id))
+		_id += 1

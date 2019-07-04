@@ -11,10 +11,11 @@ PLAYER_RADIUS = 10
 START_VEL = 7
 BALL_RADIUS = 5
 
-W, H = 1000, 700
+W, H = 1600, 860
 
 NAME_FONT = pygame.font.SysFont("comicsans", 20)
 TIME_FONT = pygame.font.SysFont("comicsans", 30)
+SCORE_FONT = pygame.font.SysFont("comicsans", 22)
 
 COLORS = [(255,0,0), (255, 128, 0), (255,255,0), (128,255,0),(0,255,0),(0,255,128),(0,255,255),(0, 128, 255), (0,0,255), (0,0,255), (128,0,255),(255,0,255), (255,0,128),(128,128,128), (0,0,0)]
 
@@ -24,7 +25,7 @@ balls = []
 
 # FUNCTIONS
 
-def redraw_window(players, balls, game_time):
+def redraw_window(players, balls, game_time, score):
 	"""
 	draws each frame
 	:return: None
@@ -36,16 +37,31 @@ def redraw_window(players, balls, game_time):
 		pygame.draw.circle(WIN, ball[2], (ball[0], ball[1]), BALL_RADIUS)
 
 	# draw each player in the list
-	for player in sorted(players):
+	for player in sorted(players, key=lambda x: players[x]["score"]):
 		p = players[player]
-		pygame.draw.circle(WIN, p["color"], (p["x"], p["y"]), PLAYER_RADIUS + p["score"])
+		pygame.draw.circle(WIN, p["color"], (p["x"], p["y"]), PLAYER_RADIUS + round(p["score"]))
 		# render and draw name for each player
 		text = NAME_FONT.render(p["name"], 1, (0,0,0))
 		WIN.blit(text, (p["x"] - text.get_width()/2, p["y"] - text.get_height()/2))
 
+	# draw scoreboard
+	sort_players = list(reversed(sorted(players, key=lambda x: players[x]["score"])))
+	title = TIME_FONT.render("Scoreboard", 1, (255,0,0))
+	start_y = 25
+	x = W - title.get_width() - 10
+	WIN.blit(title, (x, 5))
+
+	ran = min(len(players), 3)
+	for count, i in enumerate(sort_players[:ran]):
+		text = SCORE_FONT.render(str(count+1) + ". " + str(players[i]["name"]), 1, (255,0,0))
+		WIN.blit(text, (x, start_y + count * 20))
+
 	# draw time
 	text = TIME_FONT.render("Time: " + str(game_time), 1, (0,0,0))
 	WIN.blit(text,(10,10))
+	# draw score
+	text = TIME_FONT.render("Score: " + str(round(score)),1,(0,0,0))
+	WIN.blit(text,(10,15 + text.get_height()))
 
 
 def main(name):
@@ -57,6 +73,7 @@ def main(name):
 	:param players: a list of dicts represting a player
 	:return: None
 	"""
+
 
 	# start by connecting to the network
 	server = Network()
@@ -91,19 +108,19 @@ def main(name):
 		data = ""
 		# movement based on key presses
 		if keys[pygame.K_LEFT]:
-			if player["x"] - vel - PLAYER_RADIUS >= 0:
+			if player["x"] - vel - PLAYER_RADIUS - player["score"] >= 0:
 				player["x"] = player["x"] - vel
 
 		if keys[pygame.K_RIGHT]:
-			if player["x"] + vel + PLAYER_RADIUS <= W:
+			if player["x"] + vel + PLAYER_RADIUS + player["score"] <= W:
 				player["x"] = player["x"] + vel
 
 		if keys[pygame.K_UP]:
-			if player["y"] - vel - PLAYER_RADIUS >= 0:
+			if player["y"] - vel - PLAYER_RADIUS - player["score"] >= 0:
 				player["y"] = player["y"] - vel
 
 		if keys[pygame.K_DOWN]:
-			if player["y"] + vel + PLAYER_RADIUS <= H:
+			if player["y"] + vel + PLAYER_RADIUS + player["score"] <= H:
 				player["y"] = player["y"] + vel
 
 		data = "move " + str(player["x"]) + " " + str(player["y"])
@@ -112,7 +129,7 @@ def main(name):
 		balls, players, game_time = server.send(data)
 
 		# redraw window then update the frame
-		redraw_window(players, balls, game_time)
+		redraw_window(players, balls, game_time, player["score"])
 		pygame.display.update()
 
 
@@ -121,7 +138,15 @@ def main(name):
 	quit()
 
 
-name = input("Please enter your name: ")
+while True:
+ 	name = input("Please enter your name: ")
+ 	if  0 < len(name) < 20:
+ 		break
+ 	else:
+ 		print("Error, this name is not allowed (must be between 1 and 19 characters [inclusive])")
+
+import os
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,30)
 WIN = pygame.display.set_mode((W,H))
 pygame.display.set_caption("Blobs")
 main(name)
