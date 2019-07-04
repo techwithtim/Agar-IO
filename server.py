@@ -8,6 +8,7 @@ import math
 
 S = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 S.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+S.settimeout(10.0)
 
 SERVER = "10.50.120.202"
 PORT = 5555

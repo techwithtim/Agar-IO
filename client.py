@@ -3,19 +3,19 @@ import pickle
 
 
 class Network:
-    def __init__(self, name):
+    def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client.settimeout(10.0)
         self.host = "10.50.120.202"
         self.port = 5555
         self.addr = (self.host, self.port)
-        self.name = name
 
-    def connect(self):
+    def connect(self, name):
         """
         connects to server and returns the id of the client that connected
         """
         self.client.connect(self.addr)
-        self.client.send(str.encode(self.name))
+        self.client.send(str.encode(name))
         val = self.client.recv(8)
         return int(val.decode()) # can be int because will be an int id
 
@@ -37,12 +37,10 @@ class Network:
                 reply = pickle.loads(reply)
             except Exception as e:
                 print(e)
-                self.connect()
 
             return reply
         except socket.error as e:
             print(e)
-            self.connect()
 
 
 
