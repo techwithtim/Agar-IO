@@ -76,6 +76,7 @@ def main(name):
 
 
 	# start by connecting to the network
+	
 	server = Network()
 	current_id = server.connect(name)
 	balls, players, game_time = server.send("get")

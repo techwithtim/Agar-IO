@@ -1,3 +1,4 @@
+
 import socket
 from _thread import *
 import _pickle as pickle
@@ -35,6 +36,13 @@ colors = [(255,0,0), (255, 128, 0), (255,255,0), (128,255,0),(0,255,0),(0,255,12
 start = False
 stat_time = 0
 game_time = "Starting Soon"
+nxt = 1
+
+def release_mass(players):
+	for player in players:
+		p = players[player]
+		if p["score"] > 8:
+			p["score"] = math.floor(p["score"]*0.95)
 
 
 def check_collision(players, balls):
@@ -93,6 +101,7 @@ def create_balls(balls, n):
 
 		balls.append((x,y, random.choice(colors)))
 
+
 def get_start_location(players):
 	while True:
 		stop = True
@@ -108,8 +117,9 @@ def get_start_location(players):
 			break
 	return (x,y)
 
+
 def threaded_client(conn, _id):
-	global connections, players, balls, game_time
+	global connections, players, balls, game_time, nxt
 
 	current_id = _id
 
@@ -138,6 +148,9 @@ def threaded_client(conn, _id):
 	while True:
 		if start:
 			game_time = round(time.time()-start_time)
+			if game_time // 5 == nxt:
+				nxt += 1
+				release_mass(players)
 		try:
 			# Recieve data from client
 			data = conn.recv(32)
