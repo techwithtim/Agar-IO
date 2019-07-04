@@ -100,19 +100,19 @@ def main(name):
 
 		data = ""
 		# movement based on key presses
-		if keys[pygame.K_LEFT]:
+		if keys[pygame.K_LEFT] or keys[pygame.K_A]:
 			if player["x"] - vel - PLAYER_RADIUS - player["score"] >= 0:
 				player["x"] = player["x"] - vel
 
-		if keys[pygame.K_RIGHT]:
+		if keys[pygame.K_RIGHT] or keys[pygame.K_D]:
 			if player["x"] + vel + PLAYER_RADIUS + player["score"] <= W:
 				player["x"] = player["x"] + vel
 
-		if keys[pygame.K_UP]:
+		if keys[pygame.K_UP] or keys[pygame.K_W]:
 			if player["y"] - vel - PLAYER_RADIUS - player["score"] >= 0:
 				player["y"] = player["y"] - vel
 
-		if keys[pygame.K_DOWN]:
+		if keys[pygame.K_DOWN] or keys[pygame.K_S]:
 			if player["y"] + vel + PLAYER_RADIUS + player["score"] <= H:
 				player["y"] = player["y"] + vel
 
