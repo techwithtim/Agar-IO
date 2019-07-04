@@ -207,10 +207,12 @@ create_balls(balls, 150)
 while True:
 	
 	host, addr = S.accept()
-	connections += 1
-	if connections >= 2:
+	print("[CONNECTION] Connected to:", addr)
+	if addr == SERVER:
 		start = True
 		start_time = time.time()
-	print("[CONNECTION] Connected to:", addr)
+		print("[STARTED] Game Started")
+		
+	connections += 1
 	start_new_thread(threaded_client,(host,_id))
 	_id += 1
