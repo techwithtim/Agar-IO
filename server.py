@@ -163,7 +163,7 @@ def threaded_client(conn, _id):
 	:param _id: int
 	:return: None
 	"""
-	global connections, players, balls, game_time, nxt
+	global connections, players, balls, game_time, nxt, start
 
 	current_id = _id
 
