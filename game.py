@@ -36,7 +36,7 @@ def convert_time(t):
 	:return: string
 	"""
 	if t < 60:
-		return str(t)
+		return str(t) + "s"
 	else:
 		minutes = str(t // 60)
 		seconds = str(t % 60)

@@ -200,7 +200,7 @@ def threaded_client(conn, _id):
 			if game_time // MASS_LOSS_TIME == nxt:
 				nxt += 1
 				release_mass(players)
-				print("[GAME] Mass depleting")
+				print(f"[GAME] {name}'s Mass depleting")
 		try:
 			# Recieve data from client
 			data = conn.recv(32)
