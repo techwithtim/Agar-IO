@@ -204,11 +204,11 @@ def threaded_client(conn, _id):
 			# if the game time passes the round time the game will stop
 			if game_time >= ROUND_TIME:
 				start = False
-
-			if game_time // MASS_LOSS_TIME == nxt:
-				nxt += 1
-				release_mass(players)
-				print(f"[GAME] {name}'s Mass depleting")
+			else:
+				if game_time // MASS_LOSS_TIME == nxt:
+					nxt += 1
+					release_mass(players)
+					print(f"[GAME] {name}'s Mass depleting")
 		try:
 			# Recieve data from client
 			data = conn.recv(32)
@@ -259,7 +259,7 @@ def threaded_client(conn, _id):
 
 	# When user disconnects	
 	print("[DISCONNECT] Name:", name, ", Client Id:", current_id, "disconnected")
-	
+
 	connections -= 1 
 	del players[current_id]  # remove client information from players list
 	conn.close()  # close connection
