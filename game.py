@@ -35,7 +35,10 @@ def convert_time(t):
 	:param t: int
 	:return: string
 	"""
-	if t < 60:
+	if type(t) == str:
+		return t
+
+	if int(t) < 60:
 		return str(t) + "s"
 	else:
 		minutes = str(t // 60)
@@ -45,7 +48,6 @@ def convert_time(t):
 			seconds = "0" + seconds
 
 		return minutes + ":" + seconds
-
 
 
 def redraw_window(players, balls, game_time, score):
@@ -88,7 +90,6 @@ def redraw_window(players, balls, game_time, score):
 
 
 def main(name):
-	global players
 	"""
 	function for running the game,
 	includes the main loop of the game
@@ -96,6 +97,7 @@ def main(name):
 	:param players: a list of dicts represting a player
 	:return: None
 	"""
+	global players
 
 	# start by connecting to the network
 	server = Network()
@@ -170,7 +172,10 @@ while True:
 
 # make window start in top left hand corner
 os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,30)
+
 # setup pygame window
 WIN = pygame.display.set_mode((W,H))
 pygame.display.set_caption("Blobs")
+
+# start game
 main(name)

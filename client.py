@@ -11,7 +11,7 @@ class Network:
     def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #self.client.settimeout(10.0)
-        self.host = "10.50.120.202"
+        self.host = "192.168.0.187"
         self.port = 5555
         self.addr = (self.host, self.port)
 
@@ -29,6 +29,7 @@ class Network:
     def disconnect(self):
         """
         disconnects from the server
+        :return: None
         """
         self.client.close()
 

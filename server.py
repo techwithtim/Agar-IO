@@ -11,9 +11,11 @@ import time
 import random
 import math
 
+# setup sockets
 S = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 S.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-#S.settimeout(10.0)
+
+# Set constants
 PORT = 5555
 
 BALL_RADIUS = 5
@@ -28,15 +30,19 @@ W, H = 1600, 830
 HOST_NAME = socket.gethostname()
 SERVER_IP = socket.gethostbyname(HOST_NAME)
 
+# try to connect to server
 try:
     S.bind((SERVER_IP, PORT))
-
 except socket.error as e:
     print(str(e))
+    print("[SERVER] Server could not start")
+    quit()
 
-S.listen()
+S.listen()  # listen for connections
+
 print(f"[SERVER] Server Started with local ip {SERVER_IP}")
 
+# dynamic variables
 players = {}
 balls = []
 connections = 0
@@ -46,6 +52,9 @@ start = False
 stat_time = 0
 game_time = "Starting Soon"
 nxt = 1
+
+
+# FUNCTIONS
 
 def release_mass(players):
 	"""
@@ -105,7 +114,6 @@ def player_collision(players):
 				players[player1]["score"] = 0
 				players[player1]["x"], players[player1]["y"] = get_start_location(players)
 				print(f"[GAME] " + players[player2]["name"] + " ATE " + players[player1]["name"])
-
 
 
 def create_balls(balls, n):
@@ -218,9 +226,13 @@ def threaded_client(conn, _id):
 				y = int(split_data[2])
 				players[current_id]["x"] = x
 				players[current_id]["y"] = y
+
+				# only check for collison if the game has started
 				if start:
 					check_collision(players, balls)
 					player_collision(players)
+
+				# if the amount of balls is less than 150 create more
 				if len(balls) < 150:
 					create_balls(balls, random.randrange(100,150))
 					print("[GAME] Generating more orbs")
@@ -228,7 +240,7 @@ def threaded_client(conn, _id):
 				send_data = pickle.dumps((balls,players, game_time))
 
 			elif data.split(" ")[0] == "id":
-				send_data = str.encode(str(current_id))
+				send_data = str.encode(str(current_id))  # if user requests id then send it
 
 			elif data.split(" ")[0] == "jump":
 				send_data = pickle.dumps((balls,players, game_time))
@@ -241,32 +253,42 @@ def threaded_client(conn, _id):
 
 		except Exception as e:
 			print(e)
-			break
+			break  # if an exception has been reached disconnect client
 
 		time.sleep(0.001)
 
 	# When user disconnects	
 	print("[DISCONNECT] Name:", name, ", Client Id:", current_id, "disconnected")
+	
 	connections -= 1 
-	del players[current_id]
-	conn.close()
+	del players[current_id]  # remove client information from players list
+	conn.close()  # close connection
+
 
 # MAINLOOP
-# keeps looking to accept new connections
+
+# setup level with balls
 create_balls(balls, random.randrange(200,250))
+
 print("[GAME] Setting up level")
 print("[SERVER] Waiting for connections")
+
+# Keep looping to accept new connections
 while True:
 	
 	host, addr = S.accept()
 	print("[CONNECTION] Connected to:", addr)
+
+	# start game when a client on the server computer connects
 	if addr[0] == SERVER_IP and not(start):
 		start = True
 		start_time = time.time()
 		print("[STARTED] Game Started")
 
+	# increment connections start new thread then increment ids
 	connections += 1
 	start_new_thread(threaded_client,(host,_id))
 	_id += 1
 
+# when program ends
 print("[SERVER] Server offline")
