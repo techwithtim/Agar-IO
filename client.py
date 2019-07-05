@@ -13,6 +13,8 @@ class Network:
     def connect(self, name):
         """
         connects to server and returns the id of the client that connected
+        :param name: str
+        :return: int reprsenting id
         """
         self.client.connect(self.addr)
         self.client.send(str.encode(name))
