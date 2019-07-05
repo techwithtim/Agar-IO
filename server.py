@@ -9,25 +9,28 @@ import math
 S = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 S.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 #S.settimeout(10.0)
-
-SERVER = "192.168.0.163"
 PORT = 5555
 
 BALL_RADIUS = 5
 START_RADIUS = 7
 
+ROUND_TIME = 60 * 5
+
+MASS_LOSS_TIME = 7
+
 W, H = 1600, 830
 
-SERVER_IP = socket.gethostbyname(SERVER)
+HOST_NAME = socket.gethostname()
+SERVER_IP = socket.gethostbyname(HOST_NAME)
 
 try:
-    S.bind((SERVER, PORT))
+    S.bind((SERVER_IP, PORT))
 
 except socket.error as e:
     print(str(e))
 
 S.listen()
-print(f"[SERVER] Server Started with local ip {SERVER}")
+print(f"[SERVER] Server Started with local ip {SERVER_IP}")
 
 players = {}
 balls = []
@@ -83,7 +86,7 @@ def player_collision(players):
 				players[player2]["score"] = players[player2]["score"] + players[player1]["score"]
 				players[player1]["score"] = 0
 				players[player1]["x"], players[player1]["y"] = get_start_location(players)
-				print(f"[GAME] {players[player2]["name"]} ATE {players[player1]["name"]}")
+				print(f"[GAME] " + players[player2]["name"] + " ATE " + players[player1]["name"])
 
 
 
@@ -151,7 +154,11 @@ def threaded_client(conn, _id):
 
 		if start:
 			game_time = round(time.time()-start_time)
-			if game_time // 5 == nxt:
+			# if the game time passes the round time the game will stop
+			if game_time >= ROUND_TIME:
+				start = False
+
+			if game_time // MASS_LOSS_TIME == nxt:
 				nxt += 1
 				release_mass(players)
 				print("[GAME] Mass depleting")
@@ -175,8 +182,8 @@ def threaded_client(conn, _id):
 				if start:
 					check_collision(players, balls)
 					player_collision(players)
-				if len(balls) < 100:
-					create_balls(balls, random.randrange(100,200))
+				if len(balls) < 150:
+					create_balls(balls, random.randrange(100,150))
 					print("[GAME] Generating more orbs")
 
 				send_data = pickle.dumps((balls,players, game_time))
@@ -207,13 +214,14 @@ def threaded_client(conn, _id):
 
 # MAINLOOP
 # keeps looking to accept new connections
-create_balls(balls, 150)
+create_balls(balls, random.randrange(200,250))
 print("[GAME] Setting up level")
+print("[SERVER] Waiting for connections")
 while True:
 	
 	host, addr = S.accept()
 	print("[CONNECTION] Connected to:", addr)
-	if addr[0] == SERVER and not(start):
+	if addr[0] == SERVER_IP and not(start):
 		start = True
 		start_time = time.time()
 		print("[STARTED] Game Started")

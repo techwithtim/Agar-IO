@@ -18,7 +18,7 @@ W, H = 1600, 830
 
 NAME_FONT = pygame.font.SysFont("comicsans", 20)
 TIME_FONT = pygame.font.SysFont("comicsans", 30)
-SCORE_FONT = pygame.font.SysFont("comicsans", 22)
+SCORE_FONT = pygame.font.SysFont("comicsans", 26)
 
 COLORS = [(255,0,0), (255, 128, 0), (255,255,0), (128,255,0),(0,255,0),(0,255,128),(0,255,255),(0, 128, 255), (0,0,255), (0,0,255), (128,0,255),(255,0,255), (255,0,128),(128,128,128), (0,0,0)]
 
@@ -27,6 +27,26 @@ players = {}
 balls = []
 
 # FUNCTIONS
+def convert_time(t):
+	"""
+	converts a time given in seconds to a time in
+	minutes
+
+	:param t: int
+	:return: string
+	"""
+	if t < 60:
+		return str(t)
+	else:
+		minutes = str(t // 60)
+		seconds = str(t % 60)
+
+		if int(seconds) < 10:
+			seconds = "0" + seconds
+
+		return minutes + ":" + seconds
+
+
 
 def redraw_window(players, balls, game_time, score):
 	"""
@@ -49,18 +69,18 @@ def redraw_window(players, balls, game_time, score):
 
 	# draw scoreboard
 	sort_players = list(reversed(sorted(players, key=lambda x: players[x]["score"])))
-	title = TIME_FONT.render("Scoreboard", 1, (255,0,0))
+	title = TIME_FONT.render("Scoreboard", 1, (0,0,0))
 	start_y = 25
 	x = W - title.get_width() - 10
 	WIN.blit(title, (x, 5))
 
 	ran = min(len(players), 3)
 	for count, i in enumerate(sort_players[:ran]):
-		text = SCORE_FONT.render(str(count+1) + ". " + str(players[i]["name"]), 1, (255,0,0))
+		text = SCORE_FONT.render(str(count+1) + ". " + str(players[i]["name"]), 1, (0,0,0))
 		WIN.blit(text, (x, start_y + count * 20))
 
 	# draw time
-	text = TIME_FONT.render("Time: " + str(game_time), 1, (0,0,0))
+	text = TIME_FONT.render("Time: " + convert_time(game_time), 1, (0,0,0))
 	WIN.blit(text,(10,10))
 	# draw score
 	text = TIME_FONT.render("Score: " + str(round(score)),1,(0,0,0))
@@ -77,9 +97,7 @@ def main(name):
 	:return: None
 	"""
 
-
 	# start by connecting to the network
-	
 	server = Network()
 	current_id = server.connect(name)
 	balls, players, game_time = server.send("get")
@@ -142,6 +160,7 @@ def main(name):
 	quit()
 
 
+# get users name
 while True:
  	name = input("Please enter your name: ")
  	if  0 < len(name) < 20:
@@ -149,8 +168,9 @@ while True:
  	else:
  		print("Error, this name is not allowed (must be between 1 and 19 characters [inclusive])")
 
-
+# make window start in top left hand corner
 os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,30)
+# setup pygame window
 WIN = pygame.display.set_mode((W,H))
 pygame.display.set_caption("Blobs")
 main(name)
