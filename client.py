@@ -46,7 +46,7 @@ class Network:
                 self.client.send(pickle.dumps(data))
             else:
                 self.client.send(str.encode(data))
-            reply = self.client.recv(2048*2)
+            reply = self.client.recv(2048*4)
             try:
                 reply = pickle.loads(reply)
             except Exception as e:
