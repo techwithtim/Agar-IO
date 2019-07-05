@@ -22,11 +22,17 @@ class Network:
         return int(val.decode()) # can be int because will be an int id
 
     def disconnect(self):
+        """
+        disconnects from the server
+        """
         self.client.close()
 
     def send(self, data, pick=False):
         """
+        sends information to the server
+
         :param data: str
+        :param pick: boolean if should pickle or not
         :return: str
         """
         try:
