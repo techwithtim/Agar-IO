@@ -4,8 +4,8 @@ A duplication of the game Agar.io written in python
 # Running on Local Network
 Before you will be able to run this game you must make one minor change the to the file **client.py**. The *host* property from inside the __init__() method must be the local ip address of the machine that is running the server. To find this IP all you need to do is run *server.py* and read the output to see what IP it is on. Simply use that as the host property for the client.py file.
 
-# Running the Game
-To run the game you must have an instance of server.py running. You can then connect as many clients as you'd like by running game.py.
+# Playing the Game
+To run the game you must have an instance of *server.py* running. You can then connect as many clients as you'd like by running *game.py*.
 
 # Game Mechanics
 - Each game lasts 5 minutes
