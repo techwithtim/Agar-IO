@@ -110,7 +110,7 @@ def player_collision(players):
 
 			dis = math.sqrt((p1x - p2x)**2 + (p1y-p2y)**2)
 			if dis < players[player2]["score"] - players[player1]["score"]*0.85:
-				players[player2]["score"] = players[player2]["score"] + players[player1]["score"]
+				players[player2]["score"] = math.sqrt(players[player2]["score"]**2 + players[player1]["score"]**2) # adding areas instead of radii
 				players[player1]["score"] = 0
 				players[player1]["x"], players[player1]["y"] = get_start_location(players)
 				print(f"[GAME] " + players[player2]["name"] + " ATE " + players[player1]["name"])
