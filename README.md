@@ -14,5 +14,5 @@ To run the game you must have an instance of *server.py* running. You can then c
 - The game will be in "lobby" mode until started, this means all each player can do is move.
 - The game will begin once a client connects on the same machine the server is running on
 
-# Possible Erros
+# Possible Errors
 If you are having connections issues try diabsling the firewall on the server and client machines. 
